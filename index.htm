@@ -1,0 +1,57 @@
+<style>
+  :root :not(style) {
+    color: white;
+    background: black;
+    font-family: 'Courier New', Courier, monospace;
+  }
+
+  * :not(style) {
+    all: unset;
+    font-size: 2rem;
+  }
+
+  body {
+    display: block;
+    padding: 1em;
+  }
+
+  h1 {
+    display: block;
+    font-size: 1.2em;
+    margin-bottom: 1em;
+  }
+
+  form {
+    display: flex;
+    width: 100%;
+  }
+
+  label {
+    white-space: pre;
+  }
+
+  input[type="text"] {
+    width: 32ch;
+    border-bottom: .1em solid #333f;
+  }
+
+  input::placeholder {
+    font-size: .5em;
+    font-style: italic;
+    text-align: right;
+  }
+
+  b {
+    font-weight: bold;
+  }
+</style>
+
+<body>
+  <h1>
+    ZReC says hi! on <script'eval>new Date().toUTCString()</script>
+  </h1>
+  <form action="/post" method="post">
+    <label><b>Hi ZReC!</b> My name is </label>
+    <input type="text" placeholder="press enter when you're done" pattern="^\b([a-zA-Z] ?)+\b$" maxlength="32" name="n"required autofocus>
+  </form>
+</body>
