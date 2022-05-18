@@ -69,10 +69,7 @@ const [index, post, n405] = ['index.htm', 'post.htm', 'n405.htm']
 
 const router = new Router()
   .get('/', async ({ response }) => {
-    response.body = (await index()).replace(
-      /<script'eval>([\s\S]*?)<\/script>/,
-      (_, v) => eval(v)
-    );
+    response.body = (await index()).replace('<data-date/>', new Date().toUTCString());
     response.type = 'text/html';
   })
   .get('/reload', ({ request, response }) => {
