@@ -15,9 +15,7 @@ const token = (() => {
 })();
 
 function log<T>(msg: T) {
-  Deno.stdout.write(
-    new TextEncoder().encode(`${new Date().toISOString()}: ${msg}\n`)
-  );
+  console.log(`${new Date().toISOString()}: ${msg}`);
 }
 
 const app = new Application();
