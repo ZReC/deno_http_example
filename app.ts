@@ -21,7 +21,7 @@ function log<T>(msg: T) {
 }
 
 const app = new Application();
-const hostnames: [string, number][] = [['[::1]', 80], ['127.0.0.1', 80]];
+const hostnames: [string, number][] = [['0.0.0.0', 8080]];
 
 let listeners: Promise<void>[];
 let controller = new AbortController();
