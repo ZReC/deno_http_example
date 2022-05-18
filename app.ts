@@ -4,15 +4,17 @@ import {
   Status,
 } from "https://deno.land/x/oak@v10.5.1/mod.ts";
 
-const token = (() => {
+let token: string;
+function setToken () {
   const arr = new Uint8Array(16);
   crypto.getRandomValues(arr);
   let hex = '';
   for (const v of arr) {
     hex += v.toString(16).padStart(2, '0');
   }
-  return hex;
-})();
+  token = hex;
+  log(`new token is ${hex}`);
+};
 
 function log<T>(msg: T) {
   console.log(`${new Date().toISOString()}: ${msg}`);
@@ -20,21 +22,6 @@ function log<T>(msg: T) {
 
 const app = new Application();
 const hostnames: [string, number][] = [['0.0.0.0', 8080]];
-
-let listeners: Promise<void>[];
-let controller = new AbortController();
-
-function listen(hostnames: [string, number][], signal: AbortSignal) {
-  const promises = [];
-  for (const [hostname, port] of hostnames) {
-    promises.push(app.listen({ hostname, port, signal }));
-  }
-  log(
-    `listenting on ${hostnames
-      .map(([h, p]) => `http://${h}${p != 80 ? `:${p}` : ''}/`).join(' | ')
-    }`);
-  return promises;
-}
 
 function openFile(name: string): () => Promise<string> {
   let contents: Promise<string>;
@@ -72,17 +59,9 @@ const router = new Router()
   })
   .get('/reload', ({ request, response }) => {
     if (
-      request.url.searchParams.get('token') == token &&
-      !controller.signal.aborted
+      request.url.searchParams.get('token') == token
     ) {
-      log('reloading listeners');
-      controller.abort();
-      Promise.all(listeners).then(() => {
-        // don't await for listeners, they must first
-        // finish all connections to be aborted.
-        controller = new AbortController();
-        listeners = listen(hostnames, controller.signal);
-      });
+      setToken();
       response.redirect('/');
     } else {
       response.status = Status.Teapot;
@@ -110,5 +89,11 @@ const router = new Router()
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-listeners = listen(hostnames, controller.signal);
-log(`session token is ${token}`);
+(([hostname, port]) =>
+  app.listen({ hostname, port })
+)(hostnames[0]);
+log(
+  `listenting on ${hostnames
+    .map(([h, p]) => `http://${h}${p != 80 ? `:${p}` : ''}/`).join(' | ')
+  }`);
+setToken();
